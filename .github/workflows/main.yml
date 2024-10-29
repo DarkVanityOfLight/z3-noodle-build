@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04  # Use an older Ubuntu to match server dependencies
+    runs-on: ubuntu-18.04  # Use an older Ubuntu to match server dependencies
 
     steps:
       - name: Checkout repository
@@ -45,7 +45,7 @@ jobs:
         run: |
           mkdir z3-noodler/build
           cd z3-noodler/build
-          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++" ..
           make -j$(nproc)
 
       # Step 4: Save the z3-noodler binary as an artifact
