@@ -1,0 +1,51 @@
+name: Build z3-noodler
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04  # Use an older Ubuntu to match server dependencies
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 1: Install Dependencies for Building mata and z3-noodler
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+
+      # Step 2: Clone and Build mata
+      - name: Clone mata
+        run: git clone 'https://github.com/VeriFIT/mata.git'
+      
+      - name: Build and Install mata
+        run: |
+          cd mata
+          make release
+          sudo make install
+
+      # Step 3: Clone and Build z3-noodler
+      - name: Clone z3-noodler
+        run: git clone 'https://github.com/VeriFIT/z3-noodler.git'
+
+      - name: Build z3-noodler
+        run: |
+          mkdir z3-noodler/build
+          cd z3-noodler/build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          make -j$(nproc)
+
+      # Step 4: Save the z3-noodler binary as an artifact
+      - name: Upload z3-noodler binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: z3-noodler-binary
+          path: z3-noodler/build/z3
